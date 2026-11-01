@@ -11,6 +11,7 @@ A rest-of-season NFL schedule (**Weeks 8–18**) with **live scores** and **odds
 - **Sundays start collapsed**, so Thursday and Monday are visible at a glance. Tap "Show Sunday's games" to expand; the collapsed bar shows "12 games · 3 LIVE · 8 final".
 - **Live scores**: games in progress show a red LIVE chip, the quarter and clock, and the score, updating every minute while the page is open.
 - **Finals highlight the winner** in green with the final score; the loser dims.
+- **Team logos** sit left of each name (loaded from ESPN's image CDN; a winner gets a small green check on its logo).
 - **Team records and kickoff times stay current** (including flexed games). The page opens on the current NFL week.
 - **Odds row** under each game: moneyline, spread, and total (O/U) from Hard Rock Bet FL, with one "odds as of … ET" stamp at the top. A line that isn't posted shows "—".
 - **Per-week byes** are listed at the bottom of each week.

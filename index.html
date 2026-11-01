@@ -41,16 +41,19 @@ main{max-width:900px;margin:18px auto 70px;padding:0 16px}
 .team{display:flex;align-items:center;gap:10px;padding:8px 9px;border-radius:8px;margin:0 -4px}
 .team.win{background:var(--win-soft)}
 .team.lose .nm,.team.lose .rec{opacity:.45}
-.dot2{width:19px;height:19px;border-radius:50%;border:2px solid transparent;flex:none;display:flex;align-items:center;justify-content:center;transition:.12s}
-.team.win .dot2{border-color:var(--win);background:var(--win)}
-.dot2 svg{width:11px;height:11px;color:#fff;opacity:0}.team.win .dot2 svg{opacity:1}
+.lg{position:relative;width:28px;height:28px;flex:none}
+.logo{width:28px;height:28px;object-fit:contain;display:block}
+.team.lose .logo{opacity:.45}
+.wb{position:absolute;right:-5px;bottom:-4px;width:15px;height:15px;border-radius:50%;background:var(--win);border:2px solid #fff;display:none;align-items:center;justify-content:center}
+.team.win .wb{display:flex}
+.wb svg{width:8px;height:8px;color:#fff}
 .nm{font-weight:600;font-size:15px;flex:1;min-width:0}
 .team.win .nm{color:var(--win);font-weight:700}
 .team.bearteam .nm{color:var(--bear-navy)}
 .team.bearteam.win .nm{color:var(--bear-orange)}
 .rec{font-size:12px;font-weight:600;color:var(--faint);font-family:'Barlow Semi Condensed'}
 .team.win .rec{color:var(--win)}
-.atsign{font-size:10px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;padding-left:38px;margin:1px 0}
+.atsign{font-size:10px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;padding-left:47px;margin:1px 0}
 .byebox{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
 .byebox .bt{font-family:'Barlow Semi Condensed';font-weight:700;text-transform:uppercase;letter-spacing:.05em;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px;margin-bottom:9px}
 .byebox .bt:before{content:"";width:4px;height:15px;background:var(--bear-orange);border-radius:2px}
@@ -111,6 +114,9 @@ let WK=D.current, USER_WK=false;
 const OPEN={}; // Sunday sections the viewer expanded this visit, by week|date
 const pin='<svg class="pin" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/></svg>';
 const ck='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="M5 12l5 5L20 7"/></svg>';
+// Team logos from ESPN's image CDN (56px for crisp 28px display); hidden if one fails to load.
+const ESPN_ABBR={WAS:'wsh'};
+function logo(code){const a=(ESPN_ABBR[code]||code).toLowerCase();return '<img class="logo" src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/'+a+'.png&amp;w=56&amp;h=56" width="28" height="28" alt="" loading="lazy" decoding="async" onerror="this.style.visibility=\'hidden\'">';}
 const pairKey=(a,b)=>[a,b].sort().join('|');
 const ET_DAY=new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'});
 const ET_STAMP=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
@@ -253,7 +259,7 @@ function teamRow(g,side){
  const cls=r&&r.side?(r.side===side?'win':'lose'):'';
  const bt=code===HL?' bearteam':'';
  const score=s&&s.st!=='pre'&&s.t[nm]?'<span class="sc">'+s.t[nm].score+'</span>':'';
- return '<div class="team '+cls+bt+'"><div class="dot2">'+ck+'</div>'
+ return '<div class="team '+cls+bt+'"><span class="lg">'+logo(code)+'<span class="wb">'+ck+'</span></span>'
    +'<span class="nm">'+nm+'</span><span class="rec">('+rec+')</span>'+score+'</div>';
 }
 function card(g){
