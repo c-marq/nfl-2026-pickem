@@ -1,30 +1,26 @@
-# NFL 2026 Pick'em Schedule 🏈
+# NFL 2026 Scores & Odds 🏈
 
-An interactive, rest-of-season NFL schedule and pick'em — **Weeks 8–18** — built as a single self-contained `index.html`, now with **live betting odds from Hard Rock Bet (Florida)** under every game. No build step, no framework, no accounts.
+A rest-of-season NFL schedule (**Weeks 8–18**) with **live scores** and **odds from Hard Rock Bet (Florida)** under every game, built as a single self-contained `index.html`. No build step, no framework, no accounts.
 
 **▶ Live:** https://c-marq.github.io/nfl-2026-pickem/
 
 ## What it does
 
-- **Week selector** across the top (Wk 8–18), each showing how many games you've picked.
+- **Week selector** across the top (Wk 8–18), each showing the week's first game date.
 - Each week lists its games **Thursday → Monday**, with venue, kickoff time (ET), and TV network.
-- **Tap a team to pick the winner** — the winner turns green, the loser dims. Picks lock at kickoff.
+- **Sundays start collapsed**, so Thursday and Monday are visible at a glance. Tap "Show Sunday's games" to expand; the collapsed bar shows "12 games · 3 LIVE · 8 final".
 - **Live scores**: games in progress show a red LIVE chip, the quarter and clock, and the score, updating every minute while the page is open.
-- **Finals mark the winner automatically** and grade your pick (✓ / ✗). The top bar shows your record for the week, e.g. "Your picks: 5–2".
+- **Finals highlight the winner** in green with the final score; the loser dims.
 - **Team records and kickoff times stay current** (including flexed games). The page opens on the current NFL week.
 - **Odds row** under each game: moneyline, spread, and total (O/U) from Hard Rock Bet FL, with one "odds as of … ET" stamp at the top. A line that isn't posted shows "—".
 - **Per-week byes** are listed at the bottom of each week.
 - The **Chicago Bears** are highlighted in team colors (navy + burnt orange) wherever they play.
 
-## Sharing your picks
-
-Your picks are saved into the page's URL. Hit **Copy share link** and send it — whoever opens it sees your exact picks. Nothing is stored on a server; it all lives in the link.
-
 ## Where scores and records come from
 
 The page reads **ESPN's public scoreboard feed** (`site.api.espn.com/.../nfl/scoreboard`) straight from the browser. It needs no key, uses no Odds API credits, and doesn't go through the Worker. The page fetches the current week plus last week (for teams on bye), and the week you're viewing. While a game is live or about to start, it re-checks every 60 seconds; otherwise every 10 minutes, and only while the tab is visible.
 
-This feed is **unofficial and undocumented**, so ESPN could change it without notice. If it fails, the page falls back gracefully: no scores, records from the Week 8 snapshot, and picks work as before.
+This feed is **unofficial and undocumented**, so ESPN could change it without notice. If it fails, the page falls back gracefully: no scores, records from the Week 8 snapshot, and the schedule and odds work as before.
 
 ## How the odds refresh
 
