@@ -58,7 +58,9 @@ main{max-width:900px;margin:18px auto 70px;padding:0 16px}
 .byebox .bt{font-family:'Barlow Semi Condensed';font-weight:700;text-transform:uppercase;letter-spacing:.05em;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px;margin-bottom:9px}
 .byebox .bt:before{content:"";width:4px;height:15px;background:var(--bear-orange);border-radius:2px}
 .bychips{display:flex;flex-wrap:wrap;gap:6px}
-.byteam{font-size:12.5px;font-weight:600;color:var(--ink);background:#f0f2f5;border-radius:6px;padding:3px 9px}
+.byteam{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--ink);background:#f0f2f5;border-radius:6px;padding:4px 10px 4px 6px}
+.byteam .logo{width:20px;height:20px}
+.byteam.b .logo{background:#fff;border-radius:50%;padding:1px}
 .byteam.b{background:var(--bear-orange);color:#fff}
 .bynone{font-size:12.5px;color:var(--muted);font-weight:500}
 .foot{max-width:900px;margin:14px auto 0;padding:4px 16px 28px;color:var(--on-turf-3);font-size:11.5px;line-height:1.6;text-align:center}
@@ -116,7 +118,7 @@ const pin='<svg class="pin" viewBox="0 0 24 24" fill="currentColor"><path d="M12
 const ck='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="M5 12l5 5L20 7"/></svg>';
 // Team logos from ESPN's image CDN (56px for crisp 28px display); hidden if one fails to load.
 const ESPN_ABBR={WAS:'wsh'};
-function logo(code){const a=(ESPN_ABBR[code]||code).toLowerCase();return '<img class="logo" src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/'+a+'.png&amp;w=56&amp;h=56" width="28" height="28" alt="" loading="lazy" decoding="async" onerror="this.style.visibility=\'hidden\'">';}
+function logo(code,px){px=px||28;const a=(ESPN_ABBR[code]||code).toLowerCase();return '<img class="logo" src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/'+a+'.png&amp;w='+px*2+'&amp;h='+px*2+'" width="'+px+'" height="'+px+'" alt="" loading="lazy" decoding="async" onerror="this.style.visibility=\'hidden\'">';}
 const pairKey=(a,b)=>[a,b].sort().join('|');
 const ET_DAY=new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'});
 const ET_STAMP=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
@@ -276,7 +278,7 @@ function byeBox(w){
  const off=D.byes[w]||[];
  let inner;
  if(!off.length){ inner='<span class="bynone">No byes this week — all 32 teams play.</span>'; }
- else { inner='<div class="bychips">'+off.map(n=>'<span class="byteam'+(n==="Chicago Bears"?' b':'')+'">'+n.split(' ').pop()+'</span>').join('')+'</div>'; }
+ else { const code=n=>Object.keys(D.teams).find(k=>D.teams[k].n===n); inner='<div class="bychips">'+off.map(n=>'<span class="byteam'+(n==="Chicago Bears"?' b':'')+'">'+(code(n)?logo(code(n),20):'')+n.split(' ').pop()+'</span>').join('')+'</div>'; }
  return '<div class="byebox"><div class="bt">Week '+w+' · On bye</div>'+inner+'</div>';
 }
 function render(){
