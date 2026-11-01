@@ -1,0 +1,17 @@
+# Cloudflare Worker that serves cached NFL odds to the pick'em page.
+# Deploy:  cd worker && npx wrangler deploy        (only after "deploy")
+# The API key is NOT here. It is a Worker secret:  npx wrangler secret put ODDS_API_KEY
+
+name = "nfl-pickem-odds"
+main = "odds-worker.mjs"
+compatibility_date = "2026-10-01"
+
+[vars]
+ALLOWED_ORIGINS = "https://c-marq.github.io,http://localhost:8000,http://127.0.0.1:8000"
+CREDIT_FLOOR = "100"
+
+# One KV namespace holds one key ("odds:v1"). The id is not a secret.
+# Create it with:  npx wrangler kv namespace create ODDS_KV   then paste the id below.
+[[kv_namespaces]]
+binding = "ODDS_KV"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"

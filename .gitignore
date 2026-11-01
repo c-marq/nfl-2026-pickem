@@ -1,0 +1,18 @@
+# Project files that stay on this Mac (the repo holds only the public site)
+CLAUDE.md
+CLAUDE.local.md
+reference/
+.claude/
+
+# Secrets: never committed
+.env*
+*.local.*
+*.local.md
+
+# System and tooling
+.DS_Store
+node_modules/
+
+# Cloudflare Worker local secrets + cache
+.dev.vars*
+.wrangler/
