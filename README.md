@@ -8,8 +8,10 @@ An interactive, rest-of-season NFL schedule and pick'em — **Weeks 8–18** —
 
 - **Week selector** across the top (Wk 8–18), each showing how many games you've picked.
 - Each week lists its games **Thursday → Monday**, with venue, kickoff time (ET), and TV network.
-- **Tap a team to pick the winner** — the winner turns green, the loser dims.
-- **Team records** are shown next to each matchup.
+- **Tap a team to pick the winner** — the winner turns green, the loser dims. Picks lock at kickoff.
+- **Live scores**: games in progress show a red LIVE chip, the quarter and clock, and the score, updating every minute while the page is open.
+- **Finals mark the winner automatically** and grade your pick (✓ / ✗). The top bar shows your record for the week, e.g. "Your picks: 5–2".
+- **Team records and kickoff times stay current** (including flexed games). The page opens on the current NFL week.
 - **Odds row** under each game: moneyline, spread, and total (O/U) from Hard Rock Bet FL, with one "odds as of … ET" stamp at the top. A line that isn't posted shows "—".
 - **Per-week byes** are listed at the bottom of each week.
 - The **Chicago Bears** are highlighted in team colors (navy + burnt orange) wherever they play.
@@ -17,6 +19,12 @@ An interactive, rest-of-season NFL schedule and pick'em — **Weeks 8–18** —
 ## Sharing your picks
 
 Your picks are saved into the page's URL. Hit **Copy share link** and send it — whoever opens it sees your exact picks. Nothing is stored on a server; it all lives in the link.
+
+## Where scores and records come from
+
+The page reads **ESPN's public scoreboard feed** (`site.api.espn.com/.../nfl/scoreboard`) straight from the browser. It needs no key, uses no Odds API credits, and doesn't go through the Worker. The page fetches the current week plus last week (for teams on bye), and the week you're viewing. While a game is live or about to start, it re-checks every 60 seconds; otherwise every 10 minutes, and only while the tab is visible.
+
+This feed is **unofficial and undocumented**, so ESPN could change it without notice. If it fails, the page falls back gracefully: no scores, records from the Week 8 snapshot, and picks work as before.
 
 ## How the odds refresh
 
@@ -41,7 +49,7 @@ page opens ──► Cloudflare Worker (holds the API key) ──► The Odds AP
 | Non-game days: 12 h limit | 2 | 6 |
 
 - **Worst case** (5-Sunday month, 9 other game days, 16 quiet days): 5×42 + 9×15 + 16×6 = **441**. The credit floor caps real use at **400**.
-- **Expected** for ~5 friends (hourly on Sundays, about once a day otherwise): ~**300/month**.
+- **Expected** for 1–3 people, with the page left open on Sundays for live scores: about 4.3 Sundays × 40 + 9 game days × 12 + 17 quiet days × 3 ≈ **330/month**. Credits follow the clock, not the number of visitors: one open tab and three open tabs cost the same.
 
 Where the key lives: Cloudflare Worker secret **`ODDS_API_KEY`**. It's never in this repo or the page.
 
@@ -58,7 +66,8 @@ Open http://localhost:8000. On localhost the page reads odds from the mock Worke
 
 ## Notes on the data
 
-- Team records are a snapshot **as of Week 8 (Nov 1, 2026)**.
+- Team records come live from ESPN. The built-in fallback is a snapshot **as of Week 8 (Nov 1, 2026)**.
+- Weeks 8–18 were cross-checked against ESPN on Nov 1, 2026. Byes, dates, and game counts all match. Week 16–17 games without a set kickoff show "Time TBD".
 - International games show their real host city — e.g. Bengals–Falcons in Madrid (Wk 9), Patriots–Lions in Munich (Wk 10), Vikings–49ers in Mexico City (Wk 11).
 - Week 18 kickoff times read "TBD" because the NFL sets them after Week 17.
 
