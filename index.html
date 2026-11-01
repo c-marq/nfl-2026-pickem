@@ -5,11 +5,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#10151b;--muted:#69727e;--faint:#9aa3ae;--bg:#f3f5f7;--card:#fff;--line:#e6e9ed;--rail:#0b1620;
+:root{--ink:#10151b;--muted:#69727e;--faint:#9aa3ae;--bg:#2a633a;--turf-a:#2e6b3f;--turf-b:#2a633a;--on-turf:#fff;--on-turf-2:rgba(255,255,255,.88);--on-turf-3:rgba(255,255,255,.8);--card:#fff;--line:#e6e9ed;--rail:#0b1620;
  --win:#0a8a4e;--win-soft:#e7f5ee;--win-line:#bfe6cf;
  --bear-navy:#0b162a;--bear-orange:#c83803;--bear-soft:#ffd8c2;--bear-line:#e79668;}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+body{margin:0;background-color:var(--bg);background-image:linear-gradient(180deg,rgba(11,22,32,.6),rgba(11,22,32,0) 340px),repeating-linear-gradient(180deg,rgba(255,255,255,.08) 0 2px,transparent 2px 128px),repeating-linear-gradient(180deg,var(--turf-a) 0 64px,var(--turf-b) 64px 128px);background-repeat:no-repeat,repeat,repeat;min-height:100vh;color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 header{position:sticky;top:0;z-index:30;background:var(--rail);color:#fff;padding:13px 18px 0;box-shadow:0 1px 0 rgba(0,0,0,.2)}
 .hwrap{max-width:900px;margin:0 auto}
 .brand{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
@@ -22,11 +22,12 @@ header{position:sticky;top:0;z-index:30;background:var(--rail);color:#fff;paddin
 .wk.on{background:#fff;border-color:#fff;color:#0b1620}
 .wk.cur{border-color:var(--bear-orange)}
 main{max-width:900px;margin:18px auto 70px;padding:0 16px}
+.day+.day{margin-top:16px}
 .daygrid{display:grid;grid-template-columns:138px 1fr;gap:14px;align-items:start}
 .date{position:sticky;top:146px}
-.date .dow{font-family:'Barlow Semi Condensed';font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:.04em;line-height:1.15}
-.date .num{font-family:'Barlow Semi Condensed';font-weight:600;font-size:13px;color:var(--muted)}
-.date .cnt{margin-top:4px;font-size:11px;color:var(--faint);font-weight:500}
+.date .dow{font-family:'Barlow Semi Condensed';font-weight:700;font-size:15px;color:var(--on-turf);text-shadow:0 1px 2px rgba(0,0,0,.25);text-transform:uppercase;letter-spacing:.04em;line-height:1.15}
+.date .num{font-family:'Barlow Semi Condensed';font-weight:600;font-size:13px;color:var(--on-turf-2)}
+.date .cnt{margin-top:4px;font-size:11px;color:var(--on-turf-3);font-weight:500}
 .matches{display:flex;flex-direction:column;gap:8px}
 .m{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 13px 11px}
 .m.bear{border-color:var(--bear-line);background:var(--bear-soft);border-left:5px solid var(--bear-orange)}
@@ -57,9 +58,9 @@ main{max-width:900px;margin:18px auto 70px;padding:0 16px}
 .byteam{font-size:12.5px;font-weight:600;color:var(--ink);background:#f0f2f5;border-radius:6px;padding:3px 9px}
 .byteam.b{background:var(--bear-orange);color:#fff}
 .bynone{font-size:12.5px;color:var(--muted);font-weight:500}
-.foot{max-width:900px;margin:14px auto 0;padding:4px 16px;color:var(--faint);font-size:11.5px;line-height:1.6;text-align:center}
-.foot .rg{display:block;margin-top:8px;color:var(--muted)}
-.foot .rg b{color:var(--ink);font-weight:600}
+.foot{max-width:900px;margin:14px auto 0;padding:4px 16px 28px;color:var(--on-turf-3);font-size:11.5px;line-height:1.6;text-align:center}
+.foot .rg{display:block;margin-top:8px;color:var(--on-turf-2)}
+.foot .rg b{color:var(--on-turf);font-weight:600}
 .oddsbar{display:flex;align-items:center;gap:6px 9px;flex-wrap:wrap;font-size:12px;color:var(--muted);font-weight:500;margin:0 0 14px;padding:8px 12px;background:var(--card);border:1px solid var(--line);border-radius:10px}
 .oddsbar .ob{font-family:'Barlow Semi Condensed';font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink)}
 .oddsbar .warn{color:#a35a00;font-weight:600}
