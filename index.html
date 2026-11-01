@@ -69,15 +69,19 @@ main{max-width:900px;margin:18px auto 70px;padding:0 16px}
 .oddsbar{display:flex;align-items:center;gap:6px 9px;flex-wrap:wrap;font-size:12px;color:var(--muted);font-weight:500;margin:0 0 14px;padding:8px 12px;background:var(--card);border:1px solid var(--line);border-radius:10px}
 .oddsbar .ob{font-family:'Barlow Semi Condensed';font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink)}
 .oddsbar .warn{color:#a35a00;font-weight:600}
-.odds{display:flex;flex-wrap:wrap;align-items:baseline;gap:3px 14px;margin:7px -4px 0;padding:7px 9px 0;border-top:1px dashed var(--line)}
-.m.bear .odds{border-top-color:var(--bear-line)}
-.oc{display:flex;align-items:baseline;gap:5px;white-space:nowrap}
-.oc b{font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--faint)}
-.oc span{font-family:'Barlow Semi Condensed';font-weight:600;font-size:13.5px;color:var(--ink)}
-.oc span.na{color:var(--faint)}
-.otag{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);background:#f0f2f5;border-radius:4px;padding:1px 6px}
-.m.bear .otag{background:#f6dcc9}
-.odds.closed .oc span{color:var(--muted)}
+.odds{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin:9px -4px 0;padding:8px 11px;background:#eaf2fc;border:1px solid #cddff3;border-left:3px solid #2f6fb5;border-radius:8px}
+.m.bear .odds{background:rgba(255,255,255,.62);border-color:var(--bear-line);border-left-color:var(--bear-navy)}
+.oc{display:flex;align-items:baseline;gap:6px;white-space:nowrap}
+.oc b{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4d6f94}
+.m.bear .oc b{color:#7a5a48}
+.oc span{font-family:'Barlow Semi Condensed';font-weight:700;font-size:15px;color:#0d2b4d}
+.m.bear .oc span{color:var(--bear-navy)}
+.oc span.na{color:#9fb3c8;font-weight:600}
+.otag{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:4px;padding:0 6px}
+.odds.closed{background:#f3f5f7;border-color:var(--line);border-left-color:#b9c2cc}
+.odds.closed .oc b{color:var(--faint)}
+.odds.closed .oc span{color:var(--muted);font-weight:600}
+.m.bear .odds.closed{background:rgba(255,255,255,.45)}
 .sc{font-family:'Barlow Semi Condensed';font-weight:700;font-size:19px;min-width:24px;text-align:right;color:var(--ink);line-height:1}
 .team.win .sc{color:var(--win)}
 .team.lose .sc{opacity:.45}
