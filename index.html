@@ -223,7 +223,7 @@ async function tick(){
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&Date.now()-SC_LAST>60e3)tick();});
 
 // ---- Live odds (Hard Rock Bet FL) via the Cloudflare Worker; the API key never reaches this page ----
-const ODDS_URL=/^(localhost|127\.0\.0\.1)$/.test(location.hostname)?'http://localhost:8787/odds':'https://REPLACE-AT-DEPLOY.workers.dev/odds';
+const ODDS_URL=/^(localhost|127\.0\.0\.1)$/.test(location.hostname)?'http://localhost:8787/odds':'https://nfl-pickem-odds.cmarq.workers.dev/odds';
 let ODDS=null,ODDS_META=null,ODDS_STATE='loading',ODDS_AT=0;
 async function loadOdds(){
   ODDS_AT=Date.now();
