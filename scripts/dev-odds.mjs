@@ -115,6 +115,6 @@ http.createServer(async (req, res) => {
   res.writeHead(r.status, Object.fromEntries(r.headers));
   res.end(body);
   console.log(`${new Date().toLocaleTimeString()}  ${req.method} ${req.url} -> ${r.status}`);
-}).listen(PORT, () => {
+}).listen(PORT, "127.0.0.1", () => {
   console.log(`Mock odds Worker on http://localhost:${PORT}/odds  (fail=${FAIL}, mock balance=${balance}) — no real API calls.`);
 });

@@ -5,8 +5,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#10151b;--muted:#69727e;--faint:#9aa3ae;--bg:#2a633a;--turf-a:#2e6b3f;--turf-b:#2a633a;--on-turf:#fff;--on-turf-2:rgba(255,255,255,.88);--on-turf-3:rgba(255,255,255,.8);--card:#fff;--line:#e6e9ed;--rail:#0b1620;
- --win:#0a8a4e;--win-soft:#e7f5ee;--win-line:#bfe6cf;
+:root{--ink:#10151b;--muted:#535b66;--faint:#5c636c;--bg:#2a633a;--turf-a:#2e6b3f;--turf-b:#2a633a;--on-turf:#fff;--on-turf-2:rgba(255,255,255,.88);--on-turf-3:rgba(255,255,255,.8);--card:#fff;--line:#e6e9ed;--rail:#0b1620;
+ --win:#087a45;--win-soft:#e7f5ee;--win-line:#bfe6cf;
  --bear-navy:#0b162a;--bear-orange:#c83803;--bear-soft:#ffd8c2;--bear-line:#e79668;}
 *{box-sizing:border-box}
 body{margin:0;background-color:var(--bg);background-image:linear-gradient(180deg,rgba(11,22,32,.6),rgba(11,22,32,0) 340px),repeating-linear-gradient(180deg,rgba(255,255,255,.08) 0 2px,transparent 2px 128px),repeating-linear-gradient(180deg,var(--turf-a) 0 64px,var(--turf-b) 64px 128px);background-repeat:no-repeat,repeat,repeat;min-height:100vh;color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
@@ -18,7 +18,8 @@ header{position:sticky;top:0;z-index:30;background:var(--rail);color:#fff;paddin
 .brand .bears{color:var(--bear-orange);font-weight:700}
 .wkbar{display:flex;gap:6px;overflow-x:auto;margin-top:11px;padding-bottom:11px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
 .wk{flex:none;cursor:pointer;border:1px solid #2b3d4a;background:#17242f;color:#b9c6d0;border-radius:9px;padding:7px 12px;font-family:'Barlow Semi Condensed';font-weight:700;font-size:14px;letter-spacing:.02em;white-space:nowrap;display:flex;flex-direction:column;align-items:center;line-height:1.1;gap:1px}
-.wk small{font-family:Inter;font-weight:600;font-size:9.5px;opacity:.6;text-transform:uppercase;letter-spacing:.04em}
+.wk small{font-family:Inter;font-weight:600;font-size:9.5px;opacity:.72;text-transform:uppercase;letter-spacing:.04em}
+.wk:focus-visible{outline:2px solid #7fe0aa;outline-offset:2px}
 .wk.on{background:#fff;border-color:#fff;color:#0b1620}
 .wk.cur{border-color:var(--bear-orange)}
 main{max-width:900px;margin:18px auto 70px;padding:0 16px}
@@ -40,7 +41,7 @@ main{max-width:900px;margin:18px auto 70px;padding:0 16px}
 .pin{width:11px;height:11px;flex:none;opacity:.55}
 .team{display:flex;align-items:center;gap:10px;padding:8px 9px;border-radius:8px;margin:0 -4px}
 .team.win{background:var(--win-soft)}
-.team.lose .nm,.team.lose .rec{opacity:.45}
+.team.lose .nm{color:var(--muted)}
 .lg{position:relative;width:28px;height:28px;flex:none}
 .logo{width:28px;height:28px;object-fit:contain;display:block}
 .team.lose .logo{opacity:.45}
@@ -68,6 +69,7 @@ main{max-width:900px;margin:18px auto 70px;padding:0 16px}
 .foot .rg b{color:var(--on-turf);font-weight:600}
 .oddsbar{display:flex;align-items:center;gap:6px 9px;flex-wrap:wrap;font-size:12px;color:var(--muted);font-weight:500;margin:0 0 14px;padding:8px 12px;background:var(--card);border:1px solid var(--line);border-radius:10px}
 .oddsbar .ob{font-family:'Barlow Semi Condensed';font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink)}
+.note{margin:-6px 0 14px;padding:7px 12px;border-radius:10px;background:#fff7e6;border:1px solid #f3d9a4;color:#7a4a00;font-size:12px;font-weight:600}
 .oddsbar .warn{color:#a35a00;font-weight:600}
 .odds{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin:9px -4px 0;padding:8px 11px;background:#eaf2fc;border:1px solid #cddff3;border-left:3px solid #2f6fb5;border-radius:8px}
 .m.bear .odds{background:rgba(255,255,255,.62);border-color:var(--bear-line);border-left-color:var(--bear-navy)}
@@ -76,7 +78,7 @@ main{max-width:900px;margin:18px auto 70px;padding:0 16px}
 .m.bear .oc b{color:#7a5a48}
 .oc span{font-family:'Barlow Semi Condensed';font-weight:700;font-size:15px;color:#0d2b4d}
 .m.bear .oc span{color:var(--bear-navy)}
-.oc span.na{color:#9fb3c8;font-weight:600}
+.oc span.na{color:#4d6f94;font-weight:600}
 .otag{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:4px;padding:0 6px}
 .odds.closed{background:#f3f5f7;border-color:var(--line);border-left-color:#b9c2cc}
 .odds.closed .oc b{color:var(--faint)}
@@ -84,7 +86,7 @@ main{max-width:900px;margin:18px auto 70px;padding:0 16px}
 .m.bear .odds.closed{background:rgba(255,255,255,.45)}
 .sc{font-family:'Barlow Semi Condensed';font-weight:700;font-size:19px;min-width:24px;text-align:right;color:var(--ink);line-height:1}
 .team.win .sc{color:var(--win)}
-.team.lose .sc{opacity:.45}
+.team.lose .sc{color:var(--muted)}
 .live{display:inline-flex;align-items:center;gap:4px;font-family:'Barlow Semi Condensed';font-weight:700;font-size:10.5px;letter-spacing:.06em;color:#fff;background:#d62828;border-radius:4px;padding:1px 6px}
 .live:before{content:"";width:6px;height:6px;border-radius:50%;background:#fff;animation:blink 1.4s infinite}
 @keyframes blink{50%{opacity:.25}}
@@ -109,7 +111,7 @@ main{max-width:900px;margin:18px auto 70px;padding:0 16px}
 <body>
 <header><div class="hwrap">
  <div class="brand"><h1>NFL 2026 · Scores &amp; Odds</h1><span class="tz">All times ET · <span class="bears">Da Bears</span> highlighted</span></div>
-  <div class="wkbar" id="wkbar"></div>
+  <div class="wkbar" id="wkbar" role="group" aria-label="Week"></div>
 </div></header>
 <main id="app"></main>
 <div class="foot">Scores, records, and kickoff times update live from ESPN; finished games highlight the winner. If that feed is unavailable, records fall back to Week 8 (Sun, Nov 1, 2026). International games show their real host city. Week 18 kickoff times are set after Week 17.
@@ -120,48 +122,59 @@ let WK=D.current, USER_WK=false;
 const OPEN={}; // Sunday sections the viewer expanded this visit, by week|date
 const pin='<svg class="pin" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/></svg>';
 const ck='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="M5 12l5 5L20 7"/></svg>';
-// Team logos from ESPN's image CDN (56px for crisp 28px display); hidden if one fails to load.
+// Team logos from ESPN's image CDN (2x for crisp display); hidden if one fails to load.
 const ESPN_ABBR={WAS:'wsh'};
 function logo(code,px){px=px||28;const a=(ESPN_ABBR[code]||code).toLowerCase();return '<img class="logo" src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/'+a+'.png&amp;w='+px*2+'&amp;h='+px*2+'" width="'+px+'" height="'+px+'" alt="" loading="lazy" decoding="async" onerror="this.style.visibility=\'hidden\'">';}
 const pairKey=(a,b)=>[a,b].sort().join('|');
 const ET_DAY=new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'});
 const ET_STAMP=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+const ET_SHORT=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',hour:'numeric',minute:'2-digit'});
 const ET_PARTS=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'long',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',hour12:true});
+// Data from ESPN and the Worker is never trusted: text is escaped, dates and numbers validated.
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);}
+function okDate(v){if(v==null||v==='')return null;const d=new Date(v);return isNaN(d)?null:d;}
+function fmt(df,v){const d=okDate(v);return d?df.format(d):'';}
+function num(v){if(v==null||v==='')return null;const n=Number(v);return Number.isFinite(n)?n:null;}
 
 // ---- Live scores, winners, records & kickoff times: ESPN's public scoreboard (free, no key) ----
 const ESPN='https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard';
-let SC={}, RECW={}, ESPN_WK=null, SC_STATE='loading', SC_LAST=0;
+let SC={}, RECW={}, ESPN_WK=null, REC_WK=null, SC_STATE='loading', SC_LAST=0;
 const SC_AT={};
 async function loadWeek(w){ // no w = ESPN's current week
   const r=await fetch(ESPN+(w?'?seasontype=2&week='+w:''),{cache:'no-store'});
   if(!r.ok)throw new Error(r.status);
-  const j=await r.json(), wk=j.week&&j.week.number;
+  const j=await r.json(), wk=j&&j.week&&num(j.week.number);
   if(!wk||!(j.season&&j.season.type===2))return null;
   if(!w)ESPN_WK=wk;
-  (j.events||[]).forEach(e=>{
-    const c=e.competitions&&e.competitions[0], st=e.status&&e.status.type; if(!c||!st)return;
+  (Array.isArray(j.events)?j.events:[]).forEach(e=>{
+    const c=e&&e.competitions&&e.competitions[0], st=e&&e.status&&e.status.type;
+    if(!c||!st||!okDate(e.date))return;
     const t={};
-    (c.competitors||[]).forEach(x=>{
-      const n=x.team&&x.team.displayName; if(!n)return;
-      t[n]={score:x.score,win:!!x.winner};
-      const rs=x.records&&x.records[0]&&x.records[0].summary; if(rs)(RECW[wk]=RECW[wk]||{})[n]=rs;
+    (Array.isArray(c.competitors)?c.competitors:[]).forEach(x=>{
+      const n=x&&x.team&&x.team.displayName; if(typeof n!=='string')return;
+      t[n]={score:num(x.score),win:x.winner===true};
+      const rs=x.records&&x.records[0]&&x.records[0].summary;
+      if(typeof rs==='string'&&/^\d{1,2}-\d{1,2}(-\d{1,2})?$/.test(rs))(RECW[wk]=RECW[wk]||{})[n]=rs;
     });
     const names=Object.keys(t); if(names.length!==2)return;
-    SC[wk+'|'+pairKey(names[0],names[1])]={date:e.date,st:st.state,done:!!st.completed,detail:st.shortDetail||'',tbd:/TBD/i.test(st.shortDetail||''),t};
+    const detail=String(st.shortDetail||'');
+    SC[wk+'|'+pairKey(names[0],names[1])]={date:e.date,st:String(st.state||''),done:st.completed===true,detail,tbd:/TBD/i.test(detail),t};
   });
   SC_AT[wk]=Date.now(); SC_LAST=Date.now();
   return wk;
 }
 function sc(g){return SC[g.wk+'|'+pairKey(g.an,g.hn)];}
-// ESPN lists each team's record as of that week, so use the current week, then last week (teams on bye).
-function recOf(n){const c=ESPN_WK;return (RECW[c]&&RECW[c][n])||(RECW[c-1]&&RECW[c-1][n])||null;}
-// Keep kickoff day/time current (flex scheduling) from ESPN, for games not yet started.
+// ESPN lists each team's record as of that week: use the current week, then last week (teams on bye).
+// After the regular season, REC_WK is Week 18 (final records).
+function recOf(n){const c=ESPN_WK||REC_WK;if(!c)return null;return (RECW[c]&&RECW[c][n])||(RECW[c-1]&&RECW[c-1][n])||null;}
+// Keep each game's day/time current from ESPN (flex scheduling), whatever its state.
 const DOWN={Thursday:1,Friday:2,Saturday:3,Sunday:4,Monday:5,Tuesday:6,Wednesday:7};
 function applyEspn(){
   D.games.forEach(g=>{
-    const s=sc(g); if(!s||s.st!=='pre'||s.tbd)return;
-    const p={}; ET_PARTS.formatToParts(new Date(s.date)).forEach(x=>p[x.type]=x.value);
-    const date=ET_DAY.format(new Date(s.date)), time=p.hour+':'+p.minute+' '+p.dayPeriod;
+    const s=sc(g); if(!s||s.tbd)return;
+    const d=okDate(s.date); if(!d)return;
+    const p={}; ET_PARTS.formatToParts(d).forEach(x=>p[x.type]=x.value);
+    const date=ET_DAY.format(d), time=p.hour+':'+p.minute+' '+p.dayPeriod;
     if(date===g.date&&time===g.time)return;
     const h=(+p.hour%12)+(p.dayPeriod==='PM'?12:0);
     Object.assign(g,{date,time,fdate:p.month+' '+p.day,dow:p.weekday,day:p.weekday.slice(0,3),sk:[DOWN[p.weekday]||4,h*60+(+p.minute)]});
@@ -170,8 +183,9 @@ function applyEspn(){
 async function loadScores(){
   try{
     const cw=await loadWeek();
-    if(!USER_WK&&cw&&D.weeks.includes(cw))WK=cw;
-    const need=[cw-1,WK].filter(w=>w>=1&&w<=18&&w!==cw&&!SC_AT[w]);
+    if(cw){ if(!USER_WK&&D.weeks.includes(cw))WK=cw; }
+    else { await loadWeek(18); REC_WK=18; } // ESPN has moved past the regular season
+    const need=[cw?cw-1:17,WK].filter(w=>w>=1&&w<=18&&w!==cw&&!SC_AT[w]);
     await Promise.all([...new Set(need)].map(w=>loadWeek(w).catch(()=>{})));
     SC_STATE='ok';
   }catch(e){if(SC_STATE!=='ok')SC_STATE='err';}
@@ -204,75 +218,95 @@ async function loadOdds(){
   try{
     const r=await fetch(ODDS_URL,{cache:'no-store'});
     if(!r.ok)throw new Error(r.status);
-    const j=await r.json(), map={};
-    (j.games||[]).forEach(o=>{const k=pairKey(o.home,o.away);(map[k]=map[k]||[]).push(o);});
+    const j=await r.json();
+    if(!j||!okDate(j.fetched)||!Array.isArray(j.games))throw new Error('bad odds data');
+    const map={};
+    j.games.forEach(o=>{
+      if(!o||typeof o.home!=='string'||typeof o.away!=='string'||!okDate(o.commence))return;
+      const k=pairKey(o.home,o.away);(map[k]=map[k]||[]).push(o);
+    });
     ODDS=map;ODDS_META=j;ODDS_STATE='ok';
-  }catch(e){ODDS_STATE='err';}
+  }catch(e){ODDS_STATE='err';} // keep the last good odds (and their stamp) if a refresh fails
   render();
 }
 function oddsFor(g){ // same two teams, kickoff within 3 days of the listed date
   const list=ODDS&&ODDS[pairKey(g.an,g.hn)]; if(!list)return null;
   const day=Date.parse(g.date+'T12:00:00Z');
-  return list.find(o=>Math.abs(Date.parse(ET_DAY.format(new Date(o.commence))+'T12:00:00Z')-day)<=3*864e5)||null;
+  return list.find(o=>Math.abs(Date.parse(fmt(ET_DAY,o.commence)+'T12:00:00Z')-day)<=3*864e5)||null;
 }
 const MINUS='−';
-function am(p){if(typeof p!=='number')return null;return p>0?'+'+p:(p<0?MINUS+Math.abs(p):'EVEN');}
-function pt(x){return x===0?'PK':(x>0?'+'+x:MINUS+Math.abs(x));}
+function am(p){if(typeof p!=='number'||!isFinite(p))return null;return p>0?'+'+p:(p<0?MINUS+Math.abs(p):'EVEN');}
+function pt(x){if(typeof x!=='number'||!isFinite(x))return null;return x===0?'PK':(x>0?'+'+x:MINUS+Math.abs(x));}
 function oddsRow(g){
   const o=oddsFor(g), L=o&&o.lines;
-  const cell=(lab,val,title)=>'<div class="oc"'+(title?' title="'+title+'"':'')+'><b>'+lab+'</b><span'+(val?'':' class="na"')+'>'+(val||'—')+'</span></div>';
+  const cell=(lab,val,title)=>'<div class="oc"'+(title?' title="'+esc(title)+'"':'')+'><b>'+lab+'</b><span'+(val?'':' class="na"')+'>'+(val||'—')+'</span></div>';
   let ml=null,sp=null,tot=null,spT='',totT='';
   if(L&&L.ml){const a=am(L.ml[g.an]),h=am(L.ml[g.hn]);if(a||h)ml=g.a+' '+(a||'—')+' · '+g.h+' '+(h||'—');}
   if(L&&L.spread){
-    const sa=L.spread[g.an],sh=L.spread[g.hn],s=sa&&sh?(sa.point<=sh.point?[g.a,sa]:[g.h,sh]):(sa?[g.a,sa]:(sh?[g.h,sh]:null));
+    const ok=x=>x&&typeof x.point==='number'&&isFinite(x.point);
+    const sa=ok(L.spread[g.an])?L.spread[g.an]:null, sh=ok(L.spread[g.hn])?L.spread[g.hn]:null;
+    const s=sa&&sh?(sa.point<=sh.point?[g.a,sa]:[g.h,sh]):(sa?[g.a,sa]:(sh?[g.h,sh]:null));
     if(s){sp=s[1].point===0?'PK':s[0]+' '+pt(s[1].point);spT=s[0]+' '+pt(s[1].point)+(am(s[1].price)?' ('+am(s[1].price)+')':'');}
   }
-  if(L&&L.total){tot=String(L.total.point);totT='Over '+(am(L.total.over)||'—')+' / Under '+(am(L.total.under)||'—');}
+  if(L&&L.total&&typeof L.total.point==='number'&&isFinite(L.total.point)){tot=String(L.total.point);totT='Over '+(am(L.total.over)||'—')+' / Under '+(am(L.total.under)||'—');}
   const s=sc(g), closed=(o&&o.closed)||(s&&s.st!=='pre');
-  return '<div class="odds'+(closed?' closed':'')+'">'+(closed?'<span class="otag">'+(L?'Closing':'Kicked off')+'</span>':'')
+  let tag='';
+  if(closed){
+    // "Closing" only if we captured the line within an hour of kickoff; otherwise say how old it is.
+    const at=okDate(o&&o.lineAt), ko=okDate(o&&o.commence);
+    if(!L)tag='Kicked off';
+    else if(at&&ko&&ko-at<=60*60e3)tag='Closing';
+    else tag='Last line'+(at?' · '+fmt(ET_SHORT,at):'');
+  }
+  return '<div class="odds'+(closed?' closed':'')+'">'+(tag?'<span class="otag">'+esc(tag)+'</span>':'')
     +cell('ML',ml)+cell('Spread',sp,spT)+cell('O/U',tot,totT)+'</div>';
 }
 function oddsBar(){
   let s='<span class="ob">Hard Rock Bet FL odds</span>';
-  if(ODDS_STATE==='loading')s+='<span>Loading…</span>';
-  else if(ODDS_STATE==='err')s+='<span class="warn">Odds unavailable right now. Lines show “—”.</span>';
-  else{
-    s+='<span>as of '+ET_STAMP.format(new Date(ODDS_META.fetched))+' ET</span>';
-    if(ODDS_META.stale)s+='<span class="warn">· showing the last saved odds (refresh paused)</span>';
+  const at=ODDS_META&&fmt(ET_STAMP,ODDS_META.fetched);
+  if(at){
+    s+='<span>as of '+esc(at)+' ET</span>';
+    if(ODDS_STATE==='err')s+='<span class="warn">· couldn’t refresh just now</span>';
+    else if(ODDS_META.stale)s+='<span class="warn">· showing the last saved odds (refresh paused)</span>';
   }
-  return '<div class="oddsbar">'+s+'</div>';
+  else if(ODDS_STATE==='loading')s+='<span>Loading…</span>';
+  else s+='<span class="warn">Odds unavailable right now. Lines show “—”.</span>';
+  let note='';
+  if(SC_STATE==='err')note='<div class="note">Live scores are unavailable right now. Records shown are from Week 8 (Nov 1).</div>';
+  return '<div class="oddsbar">'+s+'</div>'+note;
 }
 
 // ---- Rendering ----
-function result(g){ // final result: {side:'a'|'h'|null (tie)}
-  const s=sc(g); if(!s||s.st!=='post')return null;
-  return {side:s.t[g.an]&&s.t[g.an].win?'a':(s.t[g.hn]&&s.t[g.hn].win?'h':null)};
+function result(g){ // finished games only: {side:'a'|'h'|null, tie:boolean}
+  const s=sc(g); if(!s||s.st!=='post'||!s.done)return null;
+  const a=s.t[g.an], h=s.t[g.hn]; if(!a||!h)return null;
+  let side=a.win?'a':(h.win?'h':null);
+  if(!side&&a.score!=null&&h.score!=null&&a.score!==h.score)side=a.score>h.score?'a':'h';
+  return {side, tie:!side&&a.score!=null&&a.score===h.score};
 }
-function renderBar(){
+function barHtml(){
  const cur=ESPN_WK||D.current;
- document.getElementById('wkbar').innerHTML=D.weeks.map(w=>{
+ return D.weeks.map(w=>{
    const first=D.games.filter(g=>g.wk===w).sort((a,b)=>a.date<b.date?-1:1)[0];
-   return '<div class="wk'+(w===WK?' on':'')+(w===cur?' cur':'')+'" data-w="'+w+'">Wk '+w+'<small>'+(first?first.fdate:'')+'</small></div>';
+   return '<button type="button" class="wk'+(w===WK?' on':'')+(w===cur?' cur':'')+'" data-w="'+w+'"'+(w===WK?' aria-current="true"':'')+'>Wk '+w+'<small>'+(first?first.fdate:'')+'</small></button>';
  }).join('');
- document.querySelectorAll('.wk').forEach(el=>el.addEventListener('click',()=>{
-   WK=+el.dataset.w;USER_WK=true;render();window.scrollTo(0,0);
-   if(!SC_AT[WK]||Date.now()-SC_AT[WK]>5*60e3)loadWeek(WK).then(()=>{applyEspn();render();}).catch(()=>{});
- }));
 }
 function teamRow(g,side){
  const code=side==='a'?g.a:g.h, nm=side==='a'?g.an:g.hn, rec=recOf(nm)||(side==='a'?g.ar:g.hr);
  const s=sc(g), r=result(g);
  const cls=r&&r.side?(r.side===side?'win':'lose'):'';
  const bt=code===HL?' bearteam':'';
- const score=s&&s.st!=='pre'&&s.t[nm]?'<span class="sc">'+s.t[nm].score+'</span>':'';
+ const sv=s&&(s.st==='in'||r)&&s.t[nm]?s.t[nm].score:null;
+ const score=sv!=null?'<span class="sc">'+sv+'</span>':'';
  return '<div class="team '+cls+bt+'"><span class="lg">'+logo(code)+'<span class="wb">'+ck+'</span></span>'
-   +'<span class="nm">'+nm+'</span><span class="rec">('+rec+')</span>'+score+'</div>';
+   +'<span class="nm">'+nm+'</span><span class="rec">('+esc(rec)+')</span>'+score+'</div>';
 }
 function card(g){
  const bear=(g.a===HL||g.h===HL), s=sc(g), r=result(g);
  let when='<span class="tm">'+g.time+'</span>';
- if(s&&s.st==='in')when='<span class="live">LIVE</span><span class="tm">'+s.detail+'</span>';
- else if(r)when='<span class="fin">'+s.detail+(r.side?'':' · Tie')+'</span>';
+ if(s&&s.st==='in')when='<span class="live">LIVE</span><span class="tm">'+esc(s.detail)+'</span>';
+ else if(r)when='<span class="fin">'+esc(s.detail)+(r.tie?' · Tie':'')+'</span>';
+ else if(s&&s.st==='post')when='<span class="fin">'+esc(s.detail||'Not played')+'</span>'; // postponed / canceled
  return '<div class="m'+(bear?' bear':'')+'">'
    +'<div class="meta">'+when+'<span class="dot">·</span>'+pin+'<span>'+g.ven+'</span>'
    +(bear?'<span class="bchip">DA BEARS</span>':'')+'<span class="net">'+g.net+'</span></div>'
@@ -285,8 +319,7 @@ function byeBox(w){
  else { const code=n=>Object.keys(D.teams).find(k=>D.teams[k].n===n); inner='<div class="bychips">'+off.map(n=>'<span class="byteam'+(n==="Chicago Bears"?' b':'')+'">'+(code(n)?logo(code(n),20):'')+n.split(' ').pop()+'</span>').join('')+'</div>'; }
  return '<div class="byebox"><div class="bt">Week '+w+' · On bye</div>'+inner+'</div>';
 }
-function render(){
- renderBar();
+function appHtml(){
  const gs=D.games.filter(g=>g.wk===WK).slice().sort((a,b)=>a.sk[0]-b.sk[0]||a.sk[1]-b.sk[1]);
  let html=oddsBar(),last=null;
  gs.forEach(g=>{
@@ -302,22 +335,38 @@ function render(){
        const bits=[c+' games'];
        if(live)bits.push('<span class="live">'+live+' LIVE</span>');
        if(fin)bits.push(fin+' final');
-       html+='<button class="dayx'+(open?' open':'')+'" data-k="'+key+'" aria-expanded="'+open+'">'
-         +'<span class="chev">▸</span><span class="dxt">'+(open?'Hide':'Show')+' Sunday’s games</span>'
+       html+='<button type="button" class="dayx'+(open?' open':'')+'" data-k="'+key+'" aria-expanded="'+open+'">'
+         +'<span class="chev" aria-hidden="true">▸</span><span class="dxt">'+(open?'Hide':'Show')+' Sunday’s games</span>'
          +'<span class="dxs">'+bits.join(' · ')+'</span>'+(bears?'<span class="bchip">DA BEARS</span>':'')+'</button>';
-       if(!open)html+='<div hidden>';
-       else html+='<div>';
+       html+=open?'<div>':'<div hidden>';
      } else html+='<div>';
    }
    html+=card(g);
  });
  html+='</div></div></div></div>';
  html+=byeBox(WK);
- document.getElementById('app').innerHTML=html;
- document.querySelectorAll('.dayx').forEach(el=>el.addEventListener('click',()=>{
-   const k=el.dataset.k; OPEN[k]=!OPEN[k]; if(!OPEN[k])delete OPEN[k]; render();
- }));
+ return html;
 }
+// Only touch the DOM when something changed, and keep keyboard focus where it was.
+let LAST_BAR='',LAST_APP='';
+function render(){
+ const ae=document.activeElement, fw=ae&&ae.dataset&&ae.dataset.w, fk=ae&&ae.dataset&&ae.dataset.k;
+ let bar,app;
+ try{bar=barHtml();app=appHtml();}catch(e){console.error('render failed',e);return;}
+ if(bar!==LAST_BAR){document.getElementById('wkbar').innerHTML=bar;LAST_BAR=bar;}
+ if(app!==LAST_APP){document.getElementById('app').innerHTML=app;LAST_APP=app;}
+ const t=fw?document.querySelector('.wk[data-w="'+fw+'"]'):(fk?document.querySelector('.dayx[data-k="'+fk+'"]'):null);
+ if(t&&document.activeElement!==t)t.focus({preventScroll:true});
+}
+document.getElementById('wkbar').addEventListener('click',e=>{
+ const el=e.target.closest('.wk'); if(!el)return;
+ WK=+el.dataset.w;USER_WK=true;render();window.scrollTo(0,0);
+ if(!SC_AT[WK]||Date.now()-SC_AT[WK]>5*60e3)loadWeek(WK).then(()=>{applyEspn();render();}).catch(()=>{});
+});
+document.getElementById('app').addEventListener('click',e=>{
+ const el=e.target.closest('.dayx'); if(!el)return;
+ const k=el.dataset.k; OPEN[k]=!OPEN[k]; if(!OPEN[k])delete OPEN[k]; render();
+});
 render();loadScores();loadOdds();
 </script>
 </body></html>
