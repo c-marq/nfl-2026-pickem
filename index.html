@@ -5,7 +5,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#10151b;--muted:#535b66;--faint:#5c636c;--bg:#2a633a;--turf-a:#2e6b3f;--turf-b:#2a633a;--on-turf:#fff;--on-turf-2:rgba(255,255,255,.88);--on-turf-3:rgba(255,255,255,.8);--card:#fff;--line:#e6e9ed;--rail:#0b1620;
+:root{--ink:#10151b;--muted:#535b66;--faint:#5c636c;--bg:#2a633a;--turf-a:#2e6b3f;--turf-b:#2a633a;--on-turf:#fff;--on-turf-2:rgba(255,255,255,.88);--on-turf-3:rgba(255,255,255,.88);--card:#fff;--line:#e6e9ed;--rail:#0b1620;
  --win:#087a45;--win-soft:#e7f5ee;--win-line:#bfe6cf;
  --bear-navy:#0b162a;--bear-orange:#c83803;--bear-soft:#ffd8c2;--bear-line:#e79668;}
 *{box-sizing:border-box}
@@ -15,7 +15,7 @@ header{position:sticky;top:0;z-index:30;background:var(--rail);color:#fff;paddin
 .brand{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .brand h1{font-family:'Barlow Semi Condensed';font-weight:700;font-size:21px;letter-spacing:.04em;text-transform:uppercase;margin:0}
 .brand .tz{margin-left:auto;color:#9fb0bd;font-size:12px;font-weight:500}
-.brand .bears{color:var(--bear-orange);font-weight:700}
+.brand .bears{color:#ff8a5c;font-weight:700}
 .wkbar{display:flex;gap:6px;overflow-x:auto;margin-top:11px;padding-bottom:11px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
 .wk{flex:none;cursor:pointer;border:1px solid #2b3d4a;background:#17242f;color:#b9c6d0;border-radius:9px;padding:7px 12px;font-family:'Barlow Semi Condensed';font-weight:700;font-size:14px;letter-spacing:.02em;white-space:nowrap;display:flex;flex-direction:column;align-items:center;line-height:1.1;gap:1px}
 .wk small{font-family:Inter;font-weight:600;font-size:9.5px;opacity:.72;text-transform:uppercase;letter-spacing:.04em}
@@ -84,6 +84,7 @@ main{max-width:900px;margin:18px auto 70px;padding:0 16px}
 .odds.closed .oc b{color:var(--faint)}
 .odds.closed .oc span{color:var(--muted);font-weight:600}
 .m.bear .odds.closed{background:rgba(255,255,255,.45)}
+.m.bear .odds.closed .oc span.na{color:#46688c}
 .sc{font-family:'Barlow Semi Condensed';font-weight:700;font-size:19px;min-width:24px;text-align:right;color:var(--ink);line-height:1}
 .team.win .sc{color:var(--win)}
 .team.lose .sc{color:var(--muted)}
@@ -134,6 +135,7 @@ const ET_PARTS=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',week
 function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);}
 function okDate(v){if(v==null||v==='')return null;const d=new Date(v);return isNaN(d)?null:d;}
 function fmt(df,v){const d=okDate(v);return d?df.format(d):'';}
+const TIMEOUT=()=>(window.AbortSignal&&AbortSignal.timeout?AbortSignal.timeout(10000):undefined); // never hang on "Loading…"
 function num(v){if(v==null||v==='')return null;const n=Number(v);return Number.isFinite(n)?n:null;}
 
 // ---- Live scores, winners, records & kickoff times: ESPN's public scoreboard (free, no key) ----
@@ -141,7 +143,7 @@ const ESPN='https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboar
 let SC={}, RECW={}, ESPN_WK=null, REC_WK=null, SC_STATE='loading', SC_LAST=0;
 const SC_AT={};
 async function loadWeek(w){ // no w = ESPN's current week
-  const r=await fetch(ESPN+(w?'?seasontype=2&week='+w:''),{cache:'no-store'});
+  const r=await fetch(ESPN+(w?'?seasontype=2&week='+w:''),{cache:'no-store',signal:TIMEOUT()});
   if(!r.ok)throw new Error(r.status);
   const j=await r.json(), wk=j&&j.week&&num(j.week.number);
   if(!wk||!(j.season&&j.season.type===2))return null;
@@ -184,29 +186,39 @@ async function loadScores(){
   try{
     const cw=await loadWeek();
     if(cw){ if(!USER_WK&&D.weeks.includes(cw))WK=cw; }
-    else { await loadWeek(18); REC_WK=18; } // ESPN has moved past the regular season
+    else { await loadWeek(18); REC_WK=18; if(!USER_WK)WK=18; } // ESPN has moved past the regular season
     const need=[cw?cw-1:17,WK].filter(w=>w>=1&&w<=18&&w!==cw&&!SC_AT[w]);
     await Promise.all([...new Set(need)].map(w=>loadWeek(w).catch(()=>{})));
     SC_STATE='ok';
   }catch(e){if(SC_STATE!=='ok')SC_STATE='err';}
   applyEspn();render();schedule();
 }
-function liveOrSoon(){
+function liveOrSoon(){ // only the weeks we actually refresh, and only kickoffs from the last 5 h
   const now=Date.now();
-  return Object.values(SC).some(s=>s.st==='in'||(s.st==='pre'&&!s.tbd&&Date.parse(s.date)-now<15*60e3&&now-Date.parse(s.date)<6*3600e3));
+  return Object.entries(SC).some(([k,s])=>{
+    const wk=+k.split('|')[0], t=Date.parse(s.date);
+    if((wk!==ESPN_WK&&wk!==WK)||!(now-t<5*3600e3))return false;
+    return s.st==='in'||(s.st==='pre'&&!s.tbd&&t-now<15*60e3);
+  });
 }
 let pollT=null;
 function schedule(){clearTimeout(pollT);pollT=setTimeout(tick,liveOrSoon()?60e3:10*60e3);}
+let TICKING=false;
 async function tick(){
+  if(TICKING)return;            // one refresh at a time, however many visibility events fire
   if(document.hidden){schedule();return;}
+  TICKING=true;
   try{
     await loadWeek();
     if(WK!==ESPN_WK&&SC_AT[WK]&&D.games.some(g=>g.wk===WK&&sc(g)&&sc(g).st==='in'))await loadWeek(WK);
     SC_STATE='ok';
   }catch(e){}
-  applyEspn();
-  if(Date.now()-ODDS_AT>15*60e3)loadOdds();else render();
-  schedule();
+  finally{
+    TICKING=false;
+    applyEspn();
+    if(Date.now()-ODDS_AT>15*60e3)loadOdds();else render();
+    schedule();
+  }
 }
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&Date.now()-SC_LAST>60e3)tick();});
 
@@ -216,7 +228,7 @@ let ODDS=null,ODDS_META=null,ODDS_STATE='loading',ODDS_AT=0;
 async function loadOdds(){
   ODDS_AT=Date.now();
   try{
-    const r=await fetch(ODDS_URL,{cache:'no-store'});
+    const r=await fetch(ODDS_URL,{cache:'no-store',signal:TIMEOUT()});
     if(!r.ok)throw new Error(r.status);
     const j=await r.json();
     if(!j||!okDate(j.fetched)||!Array.isArray(j.games))throw new Error('bad odds data');
@@ -249,11 +261,13 @@ function oddsRow(g){
     if(s){sp=s[1].point===0?'PK':s[0]+' '+pt(s[1].point);spT=s[0]+' '+pt(s[1].point)+(am(s[1].price)?' ('+am(s[1].price)+')':'');}
   }
   if(L&&L.total&&typeof L.total.point==='number'&&isFinite(L.total.point)){tot=String(L.total.point);totT='Over '+(am(L.total.over)||'—')+' / Under '+(am(L.total.under)||'—');}
-  const s=sc(g), closed=(o&&o.closed)||(s&&s.st!=='pre');
+  const s=sc(g), ko=okDate(o&&o.commence);
+  const closed=(o&&(o.closed||(ko&&Date.now()>=ko)))||(s&&s.st!=='pre');
+  const at=okDate(o&&o.lineAt), fetched=okDate(ODDS_META&&ODDS_META.fetched);
   let tag='';
+  if(!closed&&L&&at&&fetched&&fetched-at>3*3600e3)tag='Last line · '+fmt(ET_SHORT,at); // line pulled or not refreshed
   if(closed){
     // "Closing" only if we captured the line within an hour of kickoff; otherwise say how old it is.
-    const at=okDate(o&&o.lineAt), ko=okDate(o&&o.commence);
     if(!L)tag='Kicked off';
     else if(at&&ko&&ko-at<=60*60e3)tag='Closing';
     else tag='Last line'+(at?' · '+fmt(ET_SHORT,at):'');
@@ -267,7 +281,7 @@ function oddsBar(){
   if(at){
     s+='<span>as of '+esc(at)+' ET</span>';
     if(ODDS_STATE==='err')s+='<span class="warn">· couldn’t refresh just now</span>';
-    else if(ODDS_META.stale)s+='<span class="warn">· showing the last saved odds (refresh paused)</span>';
+    else if(ODDS_META.stale)s+='<span class="warn">· '+(ODDS_META.reason==='upstream-error'?'couldn’t reach the odds service, retrying':'showing the last saved odds (refresh paused)')+'</span>';
   }
   else if(ODDS_STATE==='loading')s+='<span>Loading…</span>';
   else s+='<span class="warn">Odds unavailable right now. Lines show “—”.</span>';
@@ -285,7 +299,7 @@ function result(g){ // finished games only: {side:'a'|'h'|null, tie:boolean}
   return {side, tie:!side&&a.score!=null&&a.score===h.score};
 }
 function barHtml(){
- const cur=ESPN_WK||D.current;
+ const cur=ESPN_WK||(REC_WK===18?18:D.current);
  return D.weeks.map(w=>{
    const first=D.games.filter(g=>g.wk===w).sort((a,b)=>a.date<b.date?-1:1)[0];
    return '<button type="button" class="wk'+(w===WK?' on':'')+(w===cur?' cur':'')+'" data-w="'+w+'"'+(w===WK?' aria-current="true"':'')+'>Wk '+w+'<small>'+(first?first.fdate:'')+'</small></button>';
@@ -347,13 +361,18 @@ function appHtml(){
  html+=byeBox(WK);
  return html;
 }
+function centerWeek(){ // scroll the week bar sideways so the selected tab is centered (never scrolls the page)
+ const bar=document.getElementById('wkbar'), on=bar.querySelector('.wk.on'); if(!on)return;
+ const b=bar.getBoundingClientRect(), r=on.getBoundingClientRect();
+ bar.scrollLeft+=(r.left+r.width/2)-(b.left+b.width/2);
+}
 // Only touch the DOM when something changed, and keep keyboard focus where it was.
 let LAST_BAR='',LAST_APP='';
 function render(){
  const ae=document.activeElement, fw=ae&&ae.dataset&&ae.dataset.w, fk=ae&&ae.dataset&&ae.dataset.k;
  let bar,app;
  try{bar=barHtml();app=appHtml();}catch(e){console.error('render failed',e);return;}
- if(bar!==LAST_BAR){document.getElementById('wkbar').innerHTML=bar;LAST_BAR=bar;}
+ if(bar!==LAST_BAR){document.getElementById('wkbar').innerHTML=bar;LAST_BAR=bar;centerWeek();}
  if(app!==LAST_APP){document.getElementById('app').innerHTML=app;LAST_APP=app;}
  const t=fw?document.querySelector('.wk[data-w="'+fw+'"]'):(fk?document.querySelector('.dayx[data-k="'+fk+'"]'):null);
  if(t&&document.activeElement!==t)t.focus({preventScroll:true});

@@ -14,7 +14,7 @@
 //     most every 6 h, so the feed resumes on its own after the monthly reset. If the balance
 //     can't be confirmed for a week, allow one refresh so a missed reset can't freeze the feed.
 //   * Waste guards:  one refresh at a time per isolate, a short KV "in flight" marker for
-//     other locations, a 5-minute back-off after an upstream failure, and a failed KV save
+//     other instances (best effort: KV can lag ~60 s between locations), a 5-minute back-off after an upstream failure, and a failed KV save
 //     never throws away a response we already paid for.
 //   * Closing lines: once a game kicks off we keep its last pre-kickoff line (with the time
 //     we captured it, `lineAt`) and never store live in-game odds.
@@ -36,7 +36,8 @@ const DEFAULT_FLOOR = 100;
 const CALL_COST = 3;            // 1 region (one book) x 3 markets
 const ASSUMED_MONTHLY = 500;    // only used if the API never reports a balance
 const RETRY_AFTER_FAIL = 5 * MIN;
-const INFLIGHT_HOLD = 30_000;
+const INFLIGHT_HOLD = 60_000;  // KV can take up to ~60 s to show the marker in other locations
+const FETCH_TIMEOUT = 10_000;  // never let a hung upstream hold every request
 const UNKNOWN_BALANCE_RETRY = 7 * DAY;
 
 let inflight = null;      // refresh already running in this isolate -> share it
@@ -54,15 +55,18 @@ export default {
 
     const now = Date.now();
     const floor = parseFloor(env.CREDIT_FLOOR);
-    const cached = newer(await readJson(env, KV_KEY, isValidCache), memCache); // corrupt value -> treated as no cache
+    const cached = clean(newer(await readJson(env, KV_KEY, isValidCache), memCache)); // corrupt value -> treated as no cache
 
     if (cached && now - Date.parse(cached.fetched) < maxAge(cached, now)) {
       return json(publicView(cached, false), 200, cors);
     }
 
-    // Under the credit floor: serve cached odds unless the free balance check says we've recovered.
-    if (cached && cached.remaining != null && cached.remaining - CALL_COST < floor) {
-      const allowed = await floorAllows(env, cached, floor, now);
+    const meta = (await readJson(env, KV_META, m => m && typeof m === "object" && !Array.isArray(m))) || {};
+
+    // A call would take the balance under the floor: serve cached odds unless the free balance check says we've recovered.
+    const bal = balanceOf(cached, meta);
+    if (cached && bal.remaining != null && bal.remaining - CALL_COST < floor) {
+      const allowed = await floorAllows(env, cached, meta, bal, floor, now);
       if (!allowed) return json(publicView(cached, true, "credit-floor"), 200, cors);
     }
 
@@ -71,17 +75,16 @@ export default {
                     : json({ error: "odds unavailable" }, 503, cors);
     }
 
-    const meta = (await readJson(env, KV_META, m => m && typeof m === "object")) || {};
     if (now < Math.max(meta.retryAfter || 0, memRetryAfter)) { // upstream failed recently: back off
       return cached ? json(publicView(cached, true, "upstream-error"), 200, cors)
                     : json({ error: "odds unavailable" }, 503, cors);
     }
-    if (cached && meta.inflightUntil && now < meta.inflightUntil) { // another location is refreshing
+    if (cached && meta.inflightUntil && now < meta.inflightUntil) { // another instance is refreshing
       return json(publicView(cached, false), 200, cors);
     }
 
     try {
-      if (!inflight) inflight = doRefresh(env, cached, now).finally(() => { inflight = null; });
+      if (!inflight) inflight = doRefresh(env, cached, meta, balanceOf(cached, meta), now).finally(() => { inflight = null; });
       const fresh = await inflight;
       return json(publicView(fresh, false), 200, cors);
     } catch (err) {
@@ -95,36 +98,38 @@ export default {
 
 // ---------- refresh ----------
 
-async function doRefresh(env, cached, now) {
-  await safePut(env, KV_META, { inflightUntil: now + INFLIGHT_HOLD });
+async function doRefresh(env, cached, meta, bal, now) {
+  // Probe/recovery bookkeeping lives in KV_META so it never overwrites a newer odds copy.
+  const keep = { probed: meta.probed, recoveryTried: meta.recoveryTried, probeRemaining: meta.probeRemaining, probeAt: meta.probeAt };
+  await safePut(env, KV_META, { ...keep, inflightUntil: now + INFLIGHT_HOLD });
   try {
-    const fresh = await refresh(env.ODDS_API_KEY, cached, now);
+    const fresh = await refresh(env.ODDS_API_KEY, cached, bal, now);
     memCache = fresh;
     await safePut(env, KV_KEY, fresh);   // if this fails we still return what we paid for
-    await safePut(env, KV_META, {});
+    await safePut(env, KV_META, keep);
     return fresh;
   } catch (err) {
     memRetryAfter = now + RETRY_AFTER_FAIL;
-    await safePut(env, KV_META, { retryAfter: memRetryAfter });
+    await safePut(env, KV_META, { ...keep, retryAfter: memRetryAfter });
     throw err;
   }
 }
 
-async function refresh(key, cached, now) {
+async function refresh(key, cached, bal, now) {
   const qs = new URLSearchParams({
     apiKey: key, bookmakers: BOOK, markets: MARKETS, oddsFormat: "american", dateFormat: "iso",
   });
-  const res = await fetch(`${API}/sports/${SPORT}/odds?${qs}`);
+  const res = await fetch(`${API}/sports/${SPORT}/odds?${qs}`, { signal: AbortSignal.timeout(FETCH_TIMEOUT) });
   if (!res.ok) throw new Error(`upstream ${res.status}`);
   const events = await res.json();
   if (!Array.isArray(events)) throw new Error("unexpected upstream shape");
 
+  const stamp = new Date(now).toISOString();
   // Balance: trust the header; if it's missing, count our own spend from the last known value.
   const header = toNum(res.headers.get("x-requests-remaining"));
-  const remaining = header != null ? header : (cached?.remaining ?? ASSUMED_MONTHLY) - CALL_COST;
-  const knownAt = header != null ? new Date(now).toISOString() : (cached?.knownAt ?? null);
+  const remaining = header != null ? header : (bal.remaining ?? ASSUMED_MONTHLY) - CALL_COST;
+  const knownAt = header != null ? stamp : (bal.knownAt ?? null);
 
-  const stamp = new Date(now).toISOString();
   const prev = new Map((cached?.games || []).map(g => [g.id, g]));
   const games = [];
   const seen = new Set();
@@ -138,11 +143,18 @@ async function refresh(key, cached, now) {
       games.push(old ? { ...old, closed: true }
                      : { id: ev.id, commence: ev.commence_time, home: ev.home_team, away: ev.away_team, closed: true, lines: null, lineAt: null });
     } else {
-      games.push({ id: ev.id, commence: ev.commence_time, home: ev.home_team, away: ev.away_team, closed: false, lineAt: stamp, ...extractLines(ev) });
+      const ex = extractLines(ev);
+      if (!hasLines(ex.lines) && old && hasLines(old.lines)) {
+        // Still listed but the Hard Rock market is missing (pulled or briefly off): keep the last
+        // real line and when we captured it, so the page can label it "Last line · <time>".
+        games.push({ ...old, commence: ev.commence_time, home: ev.home_team, away: ev.away_team, closed: false });
+      } else {
+        games.push({ id: ev.id, commence: ev.commence_time, home: ev.home_team, away: ev.away_team, closed: false, lineAt: stamp, ...ex });
+      }
     }
   }
   // Games that dropped out of the API: finished ones keep their closing line for a while;
-  // an upcoming one that vanished (line pulled) is not "closed".
+  // an upcoming one that vanished keeps its old line and old lineAt (the page labels it by age).
   for (const g of prev.values()) {
     if (!seen.has(g.id) && now - Date.parse(g.commence) < KEEP_PAST) {
       games.push({ ...g, closed: Date.parse(g.commence) <= now });
@@ -152,32 +164,34 @@ async function refresh(key, cached, now) {
   return { fetched: stamp, book: BOOK, remaining, knownAt, games };
 }
 
-// Returns true when a refresh is allowed despite the cached balance being under the floor.
-async function floorAllows(env, cached, floor, now) {
-  const upd = { ...cached };
-  let rem = null;
-  const lastProbe = Date.parse(cached.probed || 0) || 0;
+// Returns true when a refresh is allowed despite the balance being at the floor.
+// Updates `meta` (probe time/result, recovery time) and saves it to KV_META only.
+async function floorAllows(env, cached, meta, bal, floor, now) {
+  let rem = null, changed = false;
+  const lastProbe = Date.parse(meta.probed || 0) || 0;
   if (env.ODDS_API_KEY && now - lastProbe >= PROBE_EVERY) {
     rem = await probeRemaining(env.ODDS_API_KEY).catch(() => null);
-    upd.probed = new Date(now).toISOString();
-    if (rem != null) { upd.remaining = rem; upd.knownAt = upd.probed; }
+    meta.probed = new Date(now).toISOString();
+    changed = true;
+    if (rem != null) { meta.probeRemaining = rem; meta.probeAt = meta.probed; }
   }
   let allow = rem != null && rem - CALL_COST >= floor;
   // The balance can't be confirmed (no header anywhere) and hasn't been for a week:
   // allow one refresh so a monthly reset we couldn't see doesn't freeze the feed.
-  const knownAt = Date.parse(upd.knownAt || upd.fetched) || 0;
-  const lastTry = Date.parse(upd.recoveryTried || 0) || 0;
+  const knownAt = Date.parse(bal.knownAt || cached.fetched) || 0;
+  const lastTry = Date.parse(meta.recoveryTried || 0) || 0;
   if (!allow && rem == null && now - knownAt > UNKNOWN_BALANCE_RETRY && now - lastTry > UNKNOWN_BALANCE_RETRY) {
     allow = true;
-    upd.recoveryTried = new Date(now).toISOString();
+    meta.recoveryTried = new Date(now).toISOString();
+    changed = true;
   }
-  if (upd.probed !== cached.probed || upd.recoveryTried !== cached.recoveryTried) await safePut(env, KV_KEY, upd);
+  if (changed) await safePut(env, KV_META, meta);
   return allow;
 }
 
 async function probeRemaining(key) {
   // /sports does not count against the usage quota; it may report the balance.
-  const res = await fetch(`${API}/sports?${new URLSearchParams({ apiKey: key })}`);
+  const res = await fetch(`${API}/sports?${new URLSearchParams({ apiKey: key })}`, { signal: AbortSignal.timeout(FETCH_TIMEOUT) });
   return toNum(res.headers.get("x-requests-remaining"));
 }
 
@@ -222,6 +236,21 @@ const ET_DATE = new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York",
 function etDate(ms) { return ET_DATE.format(new Date(ms)); } // YYYY-MM-DD
 
 // ---------- helpers ----------
+
+function clean(c) { // drop junk entries so one bad value in KV can't crash freshness checks
+  return c ? { ...c, games: c.games.filter(g => g && typeof g === "object" && typeof g.commence === "string" && !Number.isNaN(Date.parse(g.commence))) } : null;
+}
+
+function hasLines(l) { return !!l && !!(l.ml || l.spread || l.total); }
+
+// Latest known balance: from the last odds call, or a newer free /sports probe.
+function balanceOf(cached, meta) {
+  const own = { remaining: cached?.remaining ?? null, knownAt: cached?.knownAt ?? null };
+  if (meta.probeRemaining != null && (Date.parse(meta.probeAt || 0) || 0) > (Date.parse(own.knownAt || 0) || 0)) {
+    return { remaining: meta.probeRemaining, knownAt: meta.probeAt };
+  }
+  return own;
+}
 
 function newer(a, b) {
   if (!a) return b && isValidCache(b) ? b : null;

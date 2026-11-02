@@ -35,9 +35,9 @@ page opens ──► Cloudflare Worker (holds the API key) ──► The Odds AP
 - **Fresh enough means:** under **90 minutes** during the game-day window (from 2 hours before the day's first kickoff to its last kickoff, Eastern time) and under **12 hours** otherwise. The 2-hour lead catches Sunday-morning inactives news (~11:30 AM ET).
 - **After kickoff:** a game keeps its last pre-game line. Live in-game odds are never shown. The line is labeled **Closing** only if it was captured within an hour of kickoff; otherwise it says **Last line** with the time it was captured (e.g. "Last line · Sun 9:05 AM"), because the Worker only refreshes when someone visits. A game that kicked off before we ever saw a line shows **Kicked off** and "—".
 - **Credit floor:** if a call would take the API balance below **100**, the Worker stops calling and serves the last saved odds (the page notes "refresh paused"). It re-checks the balance on a free endpoint every 6 hours, so it resumes on its own after the monthly reset. If the API ever stops reporting the balance, the Worker counts its own spend (3 per call) and, if the balance stays unconfirmed for a week, allows one refresh so a reset it couldn't see doesn't freeze the feed.
-- **Waste guards:** one refresh at a time (simultaneous visitors share it), a 5-minute back-off after an Odds API error, and a failed cache save never throws away odds that were already paid for.
+- **Waste guards:** one refresh at a time within a Worker instance (simultaneous visitors on the same instance share it; two instances in different Cloudflare locations can occasionally both refresh, about 3 extra credits, still capped by the floor), a 5-minute back-off after an Odds API error, and a failed cache save never throws away odds that were already paid for.
 - **If a refresh fails**, the page keeps showing the last odds with their "as of" time and notes "couldn't refresh just now".
-- While the page is open it asks the Worker for odds again every 15 minutes at most (the Worker's cache decides whether that costs anything).
+- While the page is open it asks the Worker for odds again about every 15–20 minutes (the check runs with the score refresh, every 10 minutes when no game is live); the Worker's cache decides whether that costs anything.
 
 ### Credit math (free plan: 500 credits/month, 3 credits per call)
 
@@ -62,13 +62,13 @@ Where the key lives: Cloudflare Worker secret **`ODDS_API_KEY`**. It's never in 
 ## Local testing (no API credits)
 
 ```bash
-python3 -m http.server 8000          # the page
+python3 -m http.server 8000 --bind 127.0.0.1          # the page
 node scripts/dev-odds.mjs            # mock Worker on :8787 with made-up odds
 #   --fail           pretend the odds service is down
 #   --remaining=40   pretend we're under the credit floor
 ```
 
-Open http://localhost:8000. On localhost the page reads odds from the mock Worker automatically.
+Open http://localhost:8000. `--bind 127.0.0.1` keeps the folder private to this Mac; without it, Python serves every file in the folder (including dotfiles like `.env.local`) to your whole network. On localhost the page reads odds from the mock Worker automatically.
 
 ## Notes on the data
 

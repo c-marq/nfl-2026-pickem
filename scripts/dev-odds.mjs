@@ -9,7 +9,7 @@
 //   node scripts/dev-odds.mjs --fail          upstream errors (page should show "—" + unavailable)
 //   node scripts/dev-odds.mjs --remaining=40  under the credit floor (serves cached, flagged stale)
 //
-// Then in another terminal:  python3 -m http.server 8000   and open http://localhost:8000
+// Then in another terminal:  python3 -m http.server 8000 --bind 127.0.0.1   and open http://localhost:8000
 
 import http from "node:http";
 import { readFileSync } from "node:fs";
